@@ -1,21 +1,7 @@
-#include "My_features.h"
+#include "diff.h"
 
-enum NodeType {
-    OPERATION,
-    CONSTANT,
-    VARIABLE
-};
 
-struct TreeNode {
-    enum NodeType type;
-    char operation;
-    double constant;
-    char* variable;
-    struct TreeNode* left;
-    struct TreeNode* right;
-};
 
-typedef struct TreeNode TreeNode;
 
 TreeNode* New_Node(enum NodeType type, void* value, TreeNode* left, TreeNode* right)
 {
@@ -43,6 +29,7 @@ TreeNode* New_Node(enum NodeType type, void* value, TreeNode* left, TreeNode* ri
     return node;
 }
 
+
 void Skip_Whitespace(FILE* file)
 {
     char c = 0;
@@ -51,6 +38,7 @@ void Skip_Whitespace(FILE* file)
     }
     ungetc(c, file);
 }
+
 
 TreeNode* Parse_Expression(FILE* file)
 {
@@ -92,70 +80,7 @@ TreeNode* Parse_Expression(FILE* file)
 }
 
 
-void Generate_Dot(TreeNode* node, FILE* file)
-{
-    if (node == NULL) return;
 
-    char label[256]="";
-    switch (node->type) {
-
-        case OPERATION:
-            snprintf(label, sizeof(label), " %c", node->operation);
-            break;
-
-        case CONSTANT:
-            snprintf(label, sizeof(label), " %.2f", node->constant);
-            break;
-
-        case VARIABLE:
-            snprintf(label, sizeof(label), " %s", node->variable);
-            break;
-    }
-    fprintf(file, "    \"%p\" [label=\" %s \"];\n", node, label);
-
-    if (node->left) {
-        fprintf(file, "    \"%p\" -> \"%p\" [label=\"left\", color=green];\n", node, node->left);
-        Generate_Dot(node->left, file);
-    }
-
-    if (node->right) {
-        fprintf(file, "    \"%p\" -> \"%p\" [label=\"right\", color=red];\n", node, node->right);
-        Generate_Dot(node->right, file);
-    }
-}
-
-void Create_Dot_File(TreeNode* root, const char* filename)
-{
-    FILE* file = fopen(filename, "w");
-    if (!file) {
-        fprintf(stderr, "Не удалось открыть файл для записи.\n");
-        return;
-    }
-
-    fprintf(file, "digraph Tree {\n");
-    fprintf(file, "node [shape=oval, style=filled, fillcolor=lightblue fontname=\"Arial\"];\n");
-
-    Generate_Dot(root, file);
-
-    fprintf(file, "}\n");
-
-    fclose(file);
-}
-
-void Display_Tree_With_Graphviz(TreeNode* root)
-{
-    const char* dotFilename = "tree.dot";
-    const char* imageFilename = "tree.png";
-
-    Create_Dot_File(root, dotFilename);
-
-
-    char command[512] = "";
-    snprintf(command, sizeof(command), "dot -Tpng tree.dot -o %s", imageFilename);
-    system(command);
-
-    printf("Граф дерева сохранён в файл %s.\n", imageFilename);
-}
 
 int main()
 {
