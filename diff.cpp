@@ -1,99 +1,54 @@
 #include "diff.h"
 
+int main () {
+    const char* filename = "input.txt";
+    expr = Read_File_To_Buffer (filename);
 
+    Tree_Node* root = Parse_Expression (expr);
+    printf ("Parsed expression:\n");
+    PrintTree (root , 0);
+    printf ("\n");
+    Create_Graph (root);
 
+    const char* latex_filename = "express";
+    Generate_Latex_File (root , latex_filename);
 
-TreeNode* New_Node(enum NodeType type, void* value, TreeNode* left, TreeNode* right)
-{
-    my_assert (value == NULL);
-    TreeNode* node = (TreeNode*) calloc (1, sizeof(TreeNode));
-    node->type = type;
-    node->left = left;
-    node->right = right;
+    Compile_Latex_To_Pdf (latex_filename);
 
-    switch (type) {
-
-        case OPERATION:
-            node->operation = *(char*)value;
-            break;
-
-        case CONSTANT:
-            node->constant = *(double*)value;
-            break;
-
-        case VARIABLE:
-            node->variable = strdup ((char*)value);
-            break;
-    }
-
-    return node;
+    free ( (char*)expr);
+    return 0;
 }
 
 
-void Skip_Whitespace(FILE* file)
+
+
+Function* Find_Function (char op)
 {
-    char c = 0;
-    while ((c = fgetc(file)) != EOF && isspace(c)) {
-
+    for (int i = 0; i < functions_count; i++) {
+        if (functions[i].name_in_file == op) {
+            return &functions[i];
+        }
     }
-    ungetc(c, file);
-}
-
-
-TreeNode* Parse_Expression(FILE* file)
-{
-    Skip_Whitespace(file);
-
-    char c = fgetc(file);
-    if (c == EOF) return NULL;
-
-    if (c == '(') {
-        TreeNode* node = Parse_Expression(file);
-        Skip_Whitespace(file);
-        fgetc(file);
-        return node;
-    }
-
-    if (c == '+' || c == '-' || c == '*' || c == '/') {
-        char op = c;
-
-        TreeNode* left = Parse_Expression(file);
-        TreeNode* right = Parse_Expression(file);
-
-        return New_Node(OPERATION, &op, left, right);
-    }
-
-    if (isdigit(c) || c == '.') {
-        ungetc(c, file);
-        double value;
-        fscanf(file, "%lf", &value);
-        return New_Node(CONSTANT, &value, NULL, NULL);
-    }
-
-    if (isalpha(c)) {
-        char var[2] = {c, '\0'};
-        return New_Node(VARIABLE, var, NULL, NULL);
-    }
-
-
     return NULL;
 }
 
 
-
-
-int main()
+Tree_Node* New_Node  (enum Node_Type type , double value , Tree_Node* left , Tree_Node* right)
 {
-    FILE* file = fopen("input.txt", "r");
-    if (!file) {
-        fprintf(stderr, "Не удалось открыть файл.\n");
-        return 1;
+    Tree_Node* node =  (Tree_Node*)malloc (sizeof (Tree_Node));
+    node->type = type;
+    node->left = left;
+    node->right = right;
+
+    if  (type == NODE_NUMBER) {
+        node->num_value = value;
+
+    } else if  (type == NODE_VARIABLE) {
+        node->var_name =  (char)value;
+
+    } else if  (type == NODE_OPERATION) {
+        node->operation =  (char)value;
     }
 
-    TreeNode* root = Parse_Expression(file);
-    fclose(file);
-
-    Display_Tree_With_Graphviz(root);
-
-    return 0;
+    return node;
 }
