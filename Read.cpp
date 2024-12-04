@@ -57,7 +57,6 @@ Tree_Node* Parse_N ()
     return New_Node (NODE_NUMBER , value , NULL , NULL);
 }
 
-// Функция обработки переменной x
 Tree_Node* Parse_V ()
 {
     if (expr[p] == 'x') {
@@ -70,18 +69,29 @@ Tree_Node* Parse_V ()
     }
 }
 
-// Функция обработки функций
+
 Tree_Node* Parse_F ()
 {
     Function* func = Find_Function (expr[p]);
     if (func != NULL) {
         p++;
-        if (expr[p] == ' (') {
+        if (expr[p] == '(') {
+
             p++;
             Tree_Node* argument = Parse_S ();
+
             if (expr[p] == ')') {
+
                 p++;
-                return New_Node (NODE_OPERATION ,  (double)func->name_in_file , argument , NULL);
+                Tree_Node* node = New_Node (NODE_OPERATION , (double) func->name_in_file , argument , NULL);
+
+                if (expr[p] == '^') {
+
+                    p++;
+                    Tree_Node* exponent = Parse_P ();
+                    node = New_Node (NODE_OPERATION , '^' , node , exponent);
+                }
+                return node;
             }
         }
     }
@@ -89,29 +99,62 @@ Tree_Node* Parse_F ()
     exit (EXIT_FAILURE);
 }
 
-// Обработка скобок , чисел , переменных и функций
+
+Tree_Node* Parse_U ()
+{
+    if (expr[p] == '-') {
+
+        p++;
+        Tree_Node* argument = Parse_P ();
+        return New_Node (NODE_OPERATION , '-' , New_Node(NODE_NUMBER , 0 , NULL , NULL) , argument);
+    }
+    return NULL;
+}
+
+
 Tree_Node* Parse_P ()
 {
-    if  (expr[p] == ' (') {
+    if (expr[p] == '(') {
+
         p++;
-        Tree_Node* node = Parse_E ();
-        if  (expr[p] == ')') {
+        Tree_Node* node = NULL;
+
+        if (expr[p] == '-') {
+            node = Parse_U ();
+
+        } else {
+            node = Parse_E ();
+        }
+
+        if (expr[p] == ')') {
+
             p++;
+            if (expr[p] == '^') {
+
+                p++;
+                Tree_Node* exponent = Parse_P ();
+                node = New_Node (NODE_OPERATION , '^' , node , exponent);
+            }
             return node;
         }
+
         printf ("Ошибка: ожидается закрывающая скобка!\n");
         exit (EXIT_FAILURE);
+    }
 
-    } else if  (isdigit (expr[p])) {
+    else if (isdigit(expr[p])) {
         return Parse_N ();
+    }
 
-    } else if  (expr[p] == 'x') {
+    else if (expr[p] == 'x') {
         return Parse_V ();
+    }
 
-    } else {
+    else {
         return Parse_F ();
     }
 }
+
 
 Tree_Node* Parse_S ()
 {
@@ -128,7 +171,7 @@ Tree_Node* Parse_S ()
     return node;
 }
 
-// Обработка умножения и деления
+
 Tree_Node* Parse_T ()
 {
     Tree_Node* node = Parse_P ();
@@ -141,6 +184,7 @@ Tree_Node* Parse_T ()
     }
     return node;
 }
+
 
 Tree_Node* Parse_E ()
 {
@@ -155,7 +199,7 @@ Tree_Node* Parse_E ()
     return node;
 }
 
-// Главное правило G: E'$'
+
 Tree_Node* Parse_G ()
 {
     Tree_Node* node = Parse_E ();
@@ -166,6 +210,7 @@ Tree_Node* Parse_G ()
         Syntax_Error ();
     return node;
 }
+
 
 Tree_Node* Parse_Expression (const char* input)
 {

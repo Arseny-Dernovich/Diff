@@ -1,44 +1,49 @@
 #include "diff.h"
 
-void  Generate_Latex (Tree_Node* node , FILE* latex_file)
+void Generate_Latex (Tree_Node* node, FILE* latex_file)
 {
-    if  (node == NULL) return;
+    if (node == NULL) return;
 
-    if  (node->type == NODE_NUMBER) {
-        fprintf (latex_file , "%.1lf" , node->num_value);
+    if (node->type == NODE_NUMBER) {
+        fprintf (latex_file, "%.1lf", node->num_value);
 
-    } else if  (node->type == NODE_VARIABLE) {
-        fprintf (latex_file , "%c" , node->var_name);
+    } else if (node->type == NODE_VARIABLE) {
+        fprintf (latex_file, "%c", node->var_name);
 
-    } else if  (node->type == NODE_OPERATION) {
+    } else if (node->type == NODE_OPERATION) {
 
-        Function* func = Find_Function (node->operation);
-        if  (func != NULL && func->type_operation == UNARY) {
-            fprintf (latex_file , "%s (" , func->latex_name);
-             Generate_Latex (node->left , latex_file);
-            fprintf (latex_file , ")");
-
+        // Проверка на унарный минус
+        if (node->operation == '-' && node->left != NULL && node->left->type == NODE_NUMBER && node->left->num_value == 0) {
+            // Унарный минус, выводим только правое поддерево
+            fprintf (latex_file, "-");
+            Generate_Latex (node->right, latex_file);
         } else {
-
-            if  (node->operation == '^') {
-
-                fprintf (latex_file , "{");
-                 Generate_Latex (node->left , latex_file);
-                fprintf (latex_file , "}^{");
-                 Generate_Latex (node->right , latex_file);
-                fprintf (latex_file , "}");
-
+            Function* func = Find_Function (node->operation);
+            if (func != NULL && func->type_operation == UNARY) {
+                fprintf (latex_file, "%s (", func->latex_name);
+                Generate_Latex (node->left, latex_file);
+                fprintf (latex_file, ")");
             } else {
 
-                fprintf (latex_file , " (");
-                 Generate_Latex (node->left , latex_file);
-                fprintf (latex_file , " %c " , node->operation);
-                 Generate_Latex (node->right , latex_file);
-                fprintf (latex_file , ")");
+                if (node->operation == '^') {
+                    fprintf (latex_file, "{");
+                    Generate_Latex (node->left, latex_file);
+                    fprintf (latex_file, "}^{");
+                    Generate_Latex (node->right, latex_file);
+                    fprintf (latex_file, "}");
+                } else {
+                    // Для других бинарных операций, например x + y
+                    fprintf (latex_file, " (");
+                    Generate_Latex (node->left, latex_file);
+                    fprintf (latex_file, " %c ", node->operation);
+                    Generate_Latex (node->right, latex_file);
+                    fprintf (latex_file, ")");
+                }
             }
         }
     }
 }
+
 
 void Generate_Latex_File (Tree_Node* root , const char* filename)
 {

@@ -1,4 +1,5 @@
 #include "My_features.h"
+// #include "TXLib.h"
 
 enum Node_Type {
     NODE_NUMBER ,
@@ -9,6 +10,13 @@ enum Node_Type {
 enum Operation_Type {
     BINARY ,
     UNARY
+};
+
+enum Math_Operations {
+    ADD = '+' ,
+    SUB = '-' ,
+    MUL = '*' ,
+    DIV = '/' ,
 };
 
 struct Tree_Node {
@@ -25,29 +33,39 @@ struct Function {
     const char* real_name;
     const char* latex_name;
     Operation_Type type_operation;
+    Tree_Node* (*differentiate) (Tree_Node* node);
 };
 
+Tree_Node* Diff_Add (Tree_Node* node);
+Tree_Node* Diff_Sub (Tree_Node* node);
+Tree_Node* Diff_Mul (Tree_Node* node);
+Tree_Node* Diff_Div (Tree_Node* node);
+Tree_Node* Diff_Sin (Tree_Node* node);
+Tree_Node* Diff_Cos (Tree_Node* node);
+Tree_Node* Diff_Ln (Tree_Node* node);
+Tree_Node* Diff_Sqrt (Tree_Node* node);
+Tree_Node* Diff_Exp(Tree_Node* node);
 
 static Function functions[] = {
-    {'s' , "sin" , "\\sin" , UNARY} ,
-    {'S' , "sqrt" , "\\sqrt" , UNARY} ,
-    {'c' , "cos" , "\\cos" , UNARY} ,
-    {'L' , "ln" , "\\ln" , UNARY} ,
-    {'+' , "+" , "+" , BINARY} ,
-    {'-' , "-" , "-" , BINARY} ,
-    {'*' , "*" , "\\cdot" , BINARY} ,
-    {'/' , "/" , "\\div" , BINARY} ,
-    {'^' , "^" , "\\wedge"  , BINARY}
+    {'s' , "sin" , "\\sin" , UNARY , Diff_Sin},
+    {'S' , "sqrt" , "\\sqrt" , UNARY , Diff_Sqrt},
+    {'c' , "cos" , "\\cos" , UNARY , Diff_Cos},
+    {'L' , "ln" , "\\ln" , UNARY , Diff_Ln},
+    {'+' , "+" , "+" , BINARY , Diff_Add},
+    {'-' , "-" , "-", BINARY , Diff_Sub},
+    {'*' , "*" , "\\cdot" , BINARY , Diff_Mul},
+    {'/' , "/" , "\\div" , BINARY , Diff_Div},
+    {'^' , "^" , "\\wedge" , BINARY , Diff_Exp}
 };
 
 const int functions_count = sizeof (functions) / sizeof (Function);
 
-Tree_Node* Parse_G ();  // Главное правило
-Tree_Node* Parse_E ();  // Основное выражение
-Tree_Node* Parse_T ();  // Обработка * , /
-Tree_Node* Parse_P ();  // Обработка скобок , чисел , переменных и функций
+Tree_Node* Parse_G ();
+Tree_Node* Parse_E ();
+Tree_Node* Parse_T ();
+Tree_Node* Parse_P ();
 Tree_Node* Parse_F ();
-Tree_Node* Parse_S ();  // Обработка функций
+Tree_Node* Parse_S ();
 void PrintTree (Tree_Node* node , int depth);
 void Create_Graph (Tree_Node* root);
 Function* Find_Function (char op);
@@ -57,6 +75,13 @@ void Compile_Latex_To_Pdf (const char* latex_filename);
 char* Read_File_To_Buffer (const char* filename);
 Tree_Node* Parse_Expression (const char* input);
 Tree_Node* New_Node (enum Node_Type type , double value , Tree_Node* left , Tree_Node* right);
+Tree_Node* Diff (Tree_Node* node);
+Tree_Node* Copy_Subtree (Tree_Node* node);
+Tree_Node* Simplify_Tree(Tree_Node* node);
+Tree_Node* Remove_Neutral_Elements(Tree_Node* node);
+Tree_Node* Fold_Constants(Tree_Node* node);
+double Evaluate(Tree_Node* node);
+void Free_Tree (Tree_Node *node);
 
 static const char* expr = "";
 static int p = 0;
