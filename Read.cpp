@@ -1,4 +1,5 @@
 #include "diff.h"
+#include "Read.h"
 
 char* Read_File_To_Buffer (const char* filename)
 {

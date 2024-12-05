@@ -6,25 +6,30 @@ int main ()
 
     char* expr = Read_File_To_Buffer (filename);
 
-    Tree_Node* root = Parse_Expression (expr);
-    printf ("Parsed expression:\n");
-    PrintTree (root, 0);
-    printf ("\n");
+    const char* latex_filename = "expres";
 
+    Tree_Node* root = Parse_Expression (expr);
+    Tree_Node* copy_root = Copy_Subtree (root);
+    Generate_Gnuplot_File(root, "plot_script.gp");
     root = Diff (root);
+    root = Simplify_Tree (root);
+    Generate_Latex_File (copy_root , root , latex_filename);
+    // printf ("Parsed expression:\n");
+    // PrintTree (root, 0);
+    // printf ("\n");
+
+    // Generate_Diff_Latex_File (root , latex_filename);
     printf ("Differentiated expression:\n");
     PrintTree (root, 0);
-    printf ("\n");
+    // printf ("\n");
 
-    root = Simplify_Tree (root);
     printf ("Simplified expression:\n");
     PrintTree (root, 0);
     printf ("\n");
 
     Create_Graph (root);
 
-    const char* latex_filename = "express";
-    Generate_Latex_File (root, latex_filename);
+    // Generate_Latex_File (root, latex_filename);
 
     Compile_Latex_To_Pdf (latex_filename);
 
@@ -35,13 +40,17 @@ int main ()
 }
 
 
-
+// enum
+// {
+// op_+ = 2
+// op_- = 1
 
 Function* Find_Function (char op)
 {
     for (int i = 0; i < functions_count; i++) {
         if (functions[i].name_in_file == op) {
             return &functions[i];
+            //return &functions[enum]
         }
     }
     return NULL;
@@ -93,5 +102,4 @@ Tree_Node* Diff (Tree_Node* node)
     fprintf (stderr, "Ошибка: неизвестный узел для дифференцирования.\n");
     exit (EXIT_FAILURE);
 }
-
 

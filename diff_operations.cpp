@@ -40,7 +40,7 @@ Tree_Node* Diff_Add (Tree_Node* node)
 Tree_Node* Diff_Sub (Tree_Node* node)
 {
     if (node == NULL || node->left == NULL || node->right == NULL) {
-        return NULL;  /
+        return NULL;
     }
     return New_Node (NODE_OPERATION , SUB , Diff (node->left) , Diff (node->right));
 }
@@ -52,7 +52,7 @@ Tree_Node* Diff_Mul (Tree_Node* node)
         return NULL;
     }
     return New_Node (NODE_OPERATION , ADD , New_Node (NODE_OPERATION , MUL , Diff (node->left) , Copy_Subtree (node->right)) ,
-    New_Node (NODE_OPERATION , MUL , Copy_Subtree (node->left) , Diff (node->right)));
+           New_Node (NODE_OPERATION , MUL , Copy_Subtree (node->left) , Diff (node->right)));
 }
 
 
@@ -62,13 +62,13 @@ Tree_Node* Diff_Div (Tree_Node* node)
         return NULL;
     }
     Tree_Node* numerator = New_Node (
-    NODE_OPERATION , SUB ,
-    New_Node (NODE_OPERATION , MUL , Diff (node->left) , Copy_Subtree (node->right)) ,
-    New_Node (NODE_OPERATION , MUL , Copy_Subtree (node->left) , Diff (node->right))
+        NODE_OPERATION , SUB ,
+        New_Node (NODE_OPERATION , MUL , Diff (node->left) , Copy_Subtree (node->right)) ,
+        New_Node (NODE_OPERATION , MUL , Copy_Subtree (node->left) , Diff (node->right))
     );
 
     Tree_Node* denominator = New_Node (
-    NODE_OPERATION , MUL , Copy_Subtree (node->right) , Copy_Subtree (node->right));
+        NODE_OPERATION , MUL , Copy_Subtree (node->right) , Copy_Subtree (node->right));
 
     return New_Node (NODE_OPERATION , DIV , numerator , denominator);
 }
@@ -93,7 +93,8 @@ Tree_Node* Diff_Cos (Tree_Node* node)
 }
 
 
-Tree_Node* Diff_Exp (Tree_Node* node) {
+Tree_Node* Diff_Exp (Tree_Node* node)
+{
     if (node == NULL || node->left == NULL || node->right == NULL) {
         return NULL;
     }
