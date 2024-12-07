@@ -10,6 +10,9 @@ Tree_Node* Copy_Subtree (Tree_Node* node) {
         fprintf (stderr, "Ошибка выделения памяти для копии поддерева.\n");
         exit (EXIT_FAILURE);
     }
+    my_assert (node == NULL);
+    new_node->left = NULL;
+    new_node->right = NULL;
 
     new_node->type = node->type;
     new_node->num_value = node->num_value;
@@ -79,7 +82,7 @@ Tree_Node* Diff_Sin (Tree_Node* node)
     if (node == NULL || node->left == NULL) {
         return NULL;
     }
-    return New_Node (NODE_OPERATION , MUL , New_Node (NODE_OPERATION , 'c' , node->left , NULL) , Diff (node->left));
+    return New_Node (NODE_OPERATION , MUL , New_Node (NODE_OPERATION , 'c' , Copy_Subtree(node->left) , NULL) , Diff (node->left));
 }
 
 
@@ -88,7 +91,7 @@ Tree_Node* Diff_Cos (Tree_Node* node)
     if (node == NULL || node->left == NULL) {
         return NULL;
     }
-    Tree_Node* diff_cos = New_Node (NODE_OPERATION , MUL , New_Node (NODE_NUMBER , -1 , NULL , NULL) , New_Node (NODE_OPERATION , 's' , node->left , NULL));
+    Tree_Node* diff_cos = New_Node (NODE_OPERATION , MUL , New_Node (NODE_NUMBER , -1 , NULL , NULL) , New_Node (NODE_OPERATION , 's' , Copy_Subtree(node->left) , NULL));
     return New_Node (NODE_OPERATION , MUL , diff_cos , Diff (node->left));
 }
 

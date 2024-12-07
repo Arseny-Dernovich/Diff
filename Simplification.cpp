@@ -16,6 +16,12 @@ double Evaluate (Tree_Node* node)
                 fprintf (stderr, "Ошибка: деление на ноль.\n");
                 exit (EXIT_FAILURE); // assert
             }
+        case SIN: return sin(node->left->num_value);
+        case COS: return  cos(node->left->num_value);
+        case LN: return log(node->left->num_value);
+
+
+
         default:
                 fprintf (stderr, "Ошибка: неизвестная операция для свёртки.\n");
                 exit (EXIT_FAILURE);
@@ -38,30 +44,50 @@ Tree_Node* Fold_Constants (Tree_Node* node)
         return New_Node (NODE_NUMBER, result, NULL, NULL);
     }
 
+    else if (node->type == NODE_OPERATION &&
+        node->left && node->right == NULL &&
+        node->left->type == NODE_NUMBER) {
+        double result = Evaluate (node);
+        // printf ("\n op = %c , result = %d" , node->operation , result);
+        return New_Node (NODE_NUMBER, result, NULL, NULL);
+    }
+
     return node;
 }
 
-Tree_Node* Remove_Neutral_Elements (Tree_Node* node)
+Tree_Node* Remove_Neutral_Elements (Tree_Node*  node)
 {
     if (node == NULL) return NULL;
 
-    node->left = Remove_Neutral_Elements (node->left);
-    node->right = Remove_Neutral_Elements (node->right);
+    Tree_Node* temp_node_right = Copy_Subtree (node->right);
+    Tree_Node* temp_node_left = Copy_Subtree (node->left);
+
+    temp_node_left = Remove_Neutral_Elements (temp_node_left);
+    temp_node_right = Remove_Neutral_Elements (temp_node_right);
 
     // Удаление нейтральных элементов для сложения
     if (node->operation == '+' && node->left->type == NODE_NUMBER && node->left->num_value == 0) {
-        return node->right;  // x + 0 = x
+        return temp_node_right;  // 0 + x = x
     }
     if (node->operation == '+' && node->right->type == NODE_NUMBER && node->right->num_value == 0) {
-        return node->left;  // 0 + x = x
+        return temp_node_left;  // x + 0 = x
     }
+
+    if (node->operation == '-' && node->left->type == NODE_NUMBER && node->left->num_value == 0) {
+        return temp_node_right;  // 0 - x = -x
+    }
+    if (node->operation == '-' && node->right->type == NODE_NUMBER && node->right->num_value == 0) {
+        return temp_node_left;  // x - 0 = x
+    }
+
+
 
     // Удаление нейтральных элементов для умножения
     if (node->operation == '*' && node->left->type == NODE_NUMBER && node->left->num_value == 1) {
-        return node->right;  // x * 1 = x
+        return temp_node_right;  // x * 1 = x
     }
     if (node->operation == '*' && node->right->type == NODE_NUMBER && node->right->num_value == 1) {
-        return node->left;  // 1 * x = x
+        return temp_node_left;  // 1 * x = x
     }
 
     // Обработка случаев умножения на 0
@@ -72,7 +98,7 @@ Tree_Node* Remove_Neutral_Elements (Tree_Node* node)
 
     // Упрощение для степени: f (x)^1 = f (x)
     if (node->operation == '^' && node->right->type == NODE_NUMBER && node->right->num_value == 1) {
-        return node->left;  // f (x)^1 = f (x)
+        return temp_node_left;  // f (x)^1 = f (x)
     }
 
     // Упрощение для степени: f (x)^0 = 1
@@ -88,16 +114,18 @@ Tree_Node* Simplify_Tree (Tree_Node* node)
 {
     if (node == NULL) return NULL;
 
-    node = Fold_Constants (node);
+    Tree_Node* copy_node = Copy_Subtree (node);
 
-    node = Remove_Neutral_Elements (node);
+    copy_node = Fold_Constants (node);
 
-    return node;
+    copy_node = Remove_Neutral_Elements (node);
+
+    return copy_node;
 }
 
 void Free_Tree (Tree_Node *node)
 {
-    if (!node) return;
+    if (node == NULL) return;
     Free_Tree (node->left);
     Free_Tree (node->right);
     free (node);

@@ -3,9 +3,9 @@
 // #include "TXLib.h"
 
 enum Node_Type {
-    NODE_NUMBER ,
-    NODE_VARIABLE ,
-    NODE_OPERATION
+    NODE_NUMBER    = 1 ,
+    NODE_VARIABLE  = 2 ,
+    NODE_OPERATION = 3 ,
 };
 
 enum Operation_Type {
@@ -18,6 +18,11 @@ enum Math_Operations {
     SUB = '-' ,
     MUL = '*' ,
     DIV = '/' ,
+    POW = '^' ,
+    SIN = 's' ,
+    COS = 'c' ,
+    LN  = 'L' ,
+    SQRT = 'S',
 };
 
 struct Tree_Node {
@@ -75,6 +80,7 @@ char* Read_File_To_Buffer (const char* filename);
 Tree_Node* Parse_Expression (const char* input);
 Tree_Node* New_Node (enum Node_Type type , double value , Tree_Node* left , Tree_Node* right);
 Tree_Node* Diff (Tree_Node* node);
+void Taylor(Tree_Node* root, int n, FILE* latex_file);
 Tree_Node* Copy_Subtree (Tree_Node* node);
 Tree_Node* Simplify_Tree (Tree_Node* node);
 Tree_Node* Remove_Neutral_Elements (Tree_Node* node);

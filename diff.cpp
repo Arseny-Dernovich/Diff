@@ -1,18 +1,27 @@
 #include "diff.h"
 
-int main ()
+int main (int argc , char** argv)
 {
     const char* filename = "input.txt";
+    if (argc == 2) {
+        filename = argv[1];
+    }
+
 
     char* expr = Read_File_To_Buffer (filename);
 
     const char* latex_filename = "expres";
 
     Tree_Node* root = Parse_Expression (expr);
+    // Create_Graph (root);
+    root = Simplify_Tree (root);
     Tree_Node* copy_root = Copy_Subtree (root);
     Generate_Gnuplot_File(root, "plot_script.gp");
+
+
     root = Diff (root);
     root = Simplify_Tree (root);
+    fprintf (stderr , "HUI\n");
     Generate_Latex_File (copy_root , root , latex_filename);
     // printf ("Parsed expression:\n");
     // PrintTree (root, 0);
@@ -27,12 +36,11 @@ int main ()
     PrintTree (root, 0);
     printf ("\n");
 
-    Create_Graph (root);
 
     // Generate_Latex_File (root, latex_filename);
 
     Compile_Latex_To_Pdf (latex_filename);
-
+// fprintf(stderr, "PORNO!\n");
     free (expr);
     Free_Tree (root);
 
@@ -93,12 +101,16 @@ Tree_Node* Diff (Tree_Node* node)
     }
 
     if (node->type == NODE_OPERATION) {
-
-        Function* func = Find_Function (node->operation);
-        return func->differentiate (node);
-
+        Function* func = Find_Function(node->operation);
+        if (func != NULL) {
+            return func->differentiate(node);
+        } else {
+            fprintf(stderr, "Ошибка: операция '%c' не поддерживается для дифференцирования.\n", node->operation);
+            exit(EXIT_FAILURE);
+        }
     }
 
+    fprintf(stderr, "Ошибка: операция \'%c\' , %d  не поддерживается для дифференцирования.\n", node->operation , node->type);
     fprintf (stderr, "Ошибка: неизвестный узел для дифференцирования.\n");
     exit (EXIT_FAILURE);
 }

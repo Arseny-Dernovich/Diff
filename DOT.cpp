@@ -22,18 +22,22 @@
 
         if (node->type == NODE_OPERATION) {
 
-            // Проверка на унарный минус
-            if (node->operation == '-' && node->left != NULL && node->left->type == NODE_NUMBER && node->left->num_value == 0) {
-                fprintf(file, "node%d [label=\"-\" , style=filled , fillcolor=%s];\n", current_node, color);
+            // printf ("\n\n\n DOT %d \n\n\n" , node->left->num_value);
+            // PrintTree (node , 0);
 
-                if (node->right) {
-                    int right_node = *node_count;
-                    Generate_DOT(node->right, file, node_count, 0);
-                    fprintf(file, "node%d -> node%d;\n", current_node, right_node);
-                }
-            } else {
+//             // Проверка на унарный минус
+//             if (node->operation == '-' && node->left != NULL && node->left->type == NODE_NUMBER && node->left->num_value == 0) {
+//                 fprintf(file, "node%d [label=\"-\" , style=filled , fillcolor=%s];\n", current_node, color);
+//
+//                 if (node->right) {
+//                     int right_node = *node_count;
+//                     Generate_DOT(node->right, file, node_count, 0);
+//                     fprintf(file, "node%d -> node%d;\n", current_node, right_node);
+//                 }
+//             } else {
                 // Бинарная операция или обычный унарный оператор
                 Function* func = Find_Function(node->operation);
+                // fprintf (stderr , "&func = %p" , func);
                 if (func != NULL && func->type_operation == UNARY) {
                     fprintf(file, "node%d [label=\"%s\" , style=filled , fillcolor=%s];\n", current_node, func->real_name, color);
                 } else {
@@ -54,7 +58,7 @@
                     int right_node = *node_count;
                     Generate_DOT(node->right, file, node_count, 0);
                     fprintf(file, "node%d -> node%d;\n", current_node, right_node);
-                }
+                // }
             }
         } else if (node->type == NODE_NUMBER) {
             fprintf(file, "node%d [label=\"%.2lf\" , style=filled , fillcolor=%s];\n", current_node, node->num_value, color);
@@ -62,6 +66,9 @@
         } else if (node->type == NODE_VARIABLE) {
             fprintf(file, "node%d [label=\"%c\" , style=filled , fillcolor=%s];\n", current_node, node->var_name, color);
         }
+
+        else
+            printf ("\nЧТО-ТО НЕ ТАК DOT\n");
     }
 
 
