@@ -53,15 +53,15 @@ Tree_Node* Diff_Sqrt (Tree_Node* node);
 Tree_Node* Diff_Exp (Tree_Node* node);
 
 static Function functions[] = {
-    {'s' , "sin" ,  "\\sin" ,  UNARY , Diff_Sin},
-    {'S' , "sqrt" , "\\sqrt" , UNARY , Diff_Sqrt},
-    {'c' , "cos" ,  "\\cos" ,  UNARY , Diff_Cos},
-    {'L' , "ln" ,   "\\ln" , UNARY , Diff_Ln},
-    {'+' , "+" ,    "+" , BINARY , Diff_Add},
-    {'-' , "-" ,    "-", BINARY , Diff_Sub},
+    {'s' , "sin" ,  "\\sin" ,  UNARY ,  Diff_Sin},
+    {'S' , "sqrt" , "\\sqrt" , UNARY ,  Diff_Sqrt},
+    {'c' , "cos" ,  "\\cos" ,  UNARY ,  Diff_Cos},
+    {'L' , "ln" ,   "\\ln" ,   UNARY ,  Diff_Ln},
+    {'+' , "+" ,    "+" ,      BINARY , Diff_Add},
+    {'-' , "-" ,    "-",       BINARY , Diff_Sub},
     {'*' , "*" ,    "\\cdot" , BINARY , Diff_Mul},
     {'/' , "/" ,    "\\frac" , BINARY , Diff_Div},
-    {'^' , "^" ,    "^" , BINARY , Diff_Exp}
+    {'^' , "^" ,    "^" ,      BINARY , Diff_Exp}
 };
 
 const int functions_count = sizeof (functions) / sizeof (Function);

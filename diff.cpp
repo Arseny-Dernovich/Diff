@@ -18,22 +18,24 @@ int main (int argc , char** argv)
     Tree_Node* copy_root = Copy_Subtree (root);
     Generate_Gnuplot_File(root, "plot_script.gp");
 
+    Tree_Node* copy_diff_root = Copy_Subtree (root);
 
-    root = Diff (root);
-    root = Simplify_Tree (root);
+
+    copy_diff_root = Diff (copy_diff_root);
+    copy_diff_root = Simplify_Tree (copy_diff_root);
+    PrintTree (copy_diff_root, 0);
     fprintf (stderr , "HUI\n");
-    Generate_Latex_File (copy_root , root , latex_filename);
+    Generate_Latex_File (copy_root , copy_diff_root , latex_filename);
     // printf ("Parsed expression:\n");
-    // PrintTree (root, 0);
     // printf ("\n");
 
     // Generate_Diff_Latex_File (root , latex_filename);
     printf ("Differentiated expression:\n");
-    PrintTree (root, 0);
+    // PrintTree (copy_diff_root, 0);
     // printf ("\n");
 
     printf ("Simplified expression:\n");
-    PrintTree (root, 0);
+    // PrintTree (copy_diff_root, 0);
     printf ("\n");
 
 

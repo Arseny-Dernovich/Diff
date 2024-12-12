@@ -2,6 +2,8 @@
 
 void Generate_Latex (Tree_Node* node, FILE* latex_file)
 {
+    printf ("\n\nNODA_ADRESS = %p\n\n" , node);
+
     if (node == NULL) return;
 
     if (node->type == NODE_NUMBER) {
@@ -281,6 +283,16 @@ void Generate_Latex_File (Tree_Node* root , Tree_Node* diff_root ,  const char* 
     fprintf (latex_file, "\\vspace{1cm}\n");
 
     fprintf (latex_file, "Производная: $");
+
+    Generate_Latex (diff_root, latex_file);
+    fprintf (latex_file, "$\n\n");
+
+    fprintf (latex_file, "\\vspace{1cm}\n");
+    fprintf (latex_file, "Производная: $");
+    diff_root = Fold_Constants (diff_root);
+
+    diff_root = Remove_Neutral_Elements (diff_root);
+
     Generate_Latex (diff_root, latex_file);
     fprintf (latex_file, "$\n\n");
 

@@ -116,9 +116,9 @@ Tree_Node* Simplify_Tree (Tree_Node* node)
 
     Tree_Node* copy_node = Copy_Subtree (node);
 
-    copy_node = Fold_Constants (node);
+    copy_node = Fold_Constants (copy_node);
 
-    copy_node = Remove_Neutral_Elements (node);
+    copy_node = Remove_Neutral_Elements (copy_node);
 
     return copy_node;
 }
